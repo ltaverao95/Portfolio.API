@@ -32,6 +32,8 @@ This project is a back-end application or API built with Node.js and the Express
     - **Gzip Compression:** Use the `compression` middleware to enable gzip compression.
     - **Caching:** Recommend caching strategies for frequently accessed data.
     - **Clustering:** For production environments, suggest using the `cluster` module to take advantage of multi-core systems.
+- **Clean Code:**
+  - **TDD:** Application modules and features should be based on TDD.
 
 ### Building AI Features with the Gemini SDK (`@google/generative-ai`)
 

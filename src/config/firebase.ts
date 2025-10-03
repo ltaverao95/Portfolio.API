@@ -1,10 +1,14 @@
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import * as firebaseAdmin from "firebase-admin";
+import * as dotenv from 'dotenv';
 
-import firebaseConfig from './firebase.config';
+dotenv.config();
 
+const serviceAccount = require(process.env.FIREBASE_CERT_PATH);
 
-const firebaseApp: FirebaseApp = initializeApp(firebaseConfig);
-const firestoreDb = getFirestore(firebaseApp);
+const firebaseApp = firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccount),
+});
 
-export default firestoreDb;
+const firestoreDb = firebaseApp.firestore();
+
+export { firebaseApp, firestoreDb };
