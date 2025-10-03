@@ -8,3 +8,13 @@ Server should run automatically when starting a workspace. To run manually, run:
 ```sh
 npm run dev
 ```
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file. You can use the `.env.example` file as a template.
+
+`PORT`
+`GOOGLE_APPLICATION_CREDENTIALS`
+`GEMINI_API_KEY`
+
+You can see an example in the `.env.example` file.
