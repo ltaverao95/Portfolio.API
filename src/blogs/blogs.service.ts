@@ -17,7 +17,7 @@ export namespace BlogService {
     return blogs;
   };
 
-  export const createBlog = async (blogDto: BlogDto): Promise<Blog> => {
+  export const createBlog = async (userId: string, blogDto: BlogDto): Promise<Blog> => {
     const { translations, imageUrl, url, tags } = blogDto;
 
     const title: { [key: string]: string } = {};
@@ -31,7 +31,7 @@ export namespace BlogService {
       title,
       content,
       defaultLanguage: translations[0].lang,
-      authorId: "admin", // Assuming a default author for now
+      authorId: userId,
       publicationDate: new Date(),
       lastModifiedDate: new Date(),
       tags: tags.split(",").map((tag) => tag.trim()),
