@@ -50,7 +50,7 @@ export const deleteBlog = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.uid;
-    await BlogService.deleteBlog(id, userId);
+    await BlogService.deleteBlogById(id, userId);
     res.status(204).send();
   } catch (error: any) {
     if (error.message === "Blog not found") {
@@ -60,5 +60,27 @@ export const deleteBlog = async (req: Request, res: Response) => {
       return res.status(403).send(error.message);
     }
     res.status(500).send("Error deleting blog");
+  }
+};
+
+/**
+ * Deletes multiple blog posts in a batch.
+ * @param req The request object.
+ * @param res The response object.
+ */
+export const deleteBlogs = async (req: Request, res: Response) => {
+  try {
+    const { blogIds } = req.body;
+    const userId = (req as any).user.uid;
+    await BlogService.deleteBlogs(blogIds, userId);
+    res.status(204).send();
+  } catch (error: any) {
+    if (error.message.includes("not found")) {
+      return res.status(404).send(error.message);
+    }
+    if (error.message.includes("not the author")) {
+      return res.status(403).send(error.message);
+    }
+    res.status(500).send("Error deleting blogs");
   }
 };

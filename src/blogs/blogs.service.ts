@@ -100,7 +100,7 @@ export namespace BlogService {
    * @param userId The ID of the user attempting to delete the blog.
    * @throws An error if the blog is not found or the user is not the author.
    */
-  export const deleteBlog = async (
+  export const deleteBlogById = async (
     blogId: string,
     userId: string
   ): Promise<void> => {
@@ -118,5 +118,38 @@ export namespace BlogService {
     }
 
     await blogRef.delete();
+  };
+
+  /**
+   * Deletes multiple blog posts in a batch.
+   * @param blogIds An array of blog IDs to delete.
+   * @param userId The ID of the user attempting to delete the blogs.
+   * @throws An error if any of the blogs are not found or the user is not the author.
+   */
+  export const deleteBlogs = async (
+    blogIds: string[],
+    userId: string
+  ): Promise<void> => {
+    const batch = firestoreDb.batch();
+    const blogRefs = blogIds.map((id) =>
+      firestoreDb.collection("blogPosts").doc(id)
+    );
+
+    const blogDocs = await firestoreDb.getAll(...blogRefs);
+
+    for (const doc of blogDocs) {
+      if (!doc.exists) {
+        throw new Error(`Blog with ID ${doc.id} not found`);
+      }
+      const blog = { id: doc.id, ...doc.data() } as Blog;
+      if (blog.authorId !== userId) {
+        throw new Error(
+          `User is not the author of blog with ID ${doc.id}`
+        );
+      }
+      batch.delete(doc.ref);
+    }
+
+    await batch.commit();
   };
 }
