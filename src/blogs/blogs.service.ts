@@ -43,4 +43,54 @@ export namespace BlogService {
 
     return { id: docRef.id, ...newBlog } as Blog;
   };
+
+  /**
+   * Updates an existing blog post.
+   * @param blogId The ID of the blog to update.
+   * @param blogDto The data to update the blog with.
+   * @param userId The ID of the user attempting to update the blog.
+   * @returns The updated blog post.
+   * @throws An error if the blog is not found or the user is not the author.
+   */
+  export const updateBlog = async (
+    blogId: string,
+    blogDto: BlogDto,
+    userId: string
+  ): Promise<Blog> => {
+    const blogRef = firestoreDb.collection("blogPosts").doc(blogId);
+    const doc = await blogRef.get();
+
+    if (!doc.exists) {
+      throw new Error("Blog not found");
+    }
+
+    const blog = { id: doc.id, ...doc.data() } as Blog;
+
+    if (blog.authorId !== userId) {
+      throw new Error("User is not the author of this blog");
+    }
+
+    const { translations, imageUrl, url, tags } = blogDto;
+
+    const title: { [key: string]: string } = {};
+    const content: { [key: string]: string } = {};
+    translations.forEach((t) => {
+      title[t.lang] = t.title;
+      content[t.lang] = t.content;
+    });
+
+    const updatedBlog: Partial<Blog> = {
+      title,
+      content,
+      lastModifiedDate: new Date(),
+      tags: tags.split(",").map((tag) => tag.trim()),
+      imageUrl,
+      url,
+    };
+
+    await blogRef.update(updatedBlog);
+
+    const newDoc = await blogRef.get();
+    return { id: newDoc.id, ...newDoc.data() } as Blog;
+  };
 }

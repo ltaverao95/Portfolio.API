@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { BlogDto } from "./models/blog-dto.model";
+import { BlogDto } from "../models/blog-dto.model";
 
-export const validateCreateBlog = (
+/**
+ * Validates the data for creating or updating a blog post.
+ * @param req The request object.
+ * @param res The response object.
+ * @param next The next middleware function.
+ */
+export const validateBlogDto = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -20,11 +26,9 @@ export const validateCreateBlog = (
 
   for (const translation of translations) {
     if (!translation.lang || !translation.title || !translation.content) {
-      return res
-        .status(400)
-        .json({
-          message: "Each translation must include lang, title, and content.",
-        });
+      return res.status(400).json({
+        message: "Each translation must include lang, title, and content.",
+      });
     }
   }
 
