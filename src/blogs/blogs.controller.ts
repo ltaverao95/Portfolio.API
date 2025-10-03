@@ -40,3 +40,25 @@ export const updateBlog = async (req: Request, res: Response) => {
     res.status(500).send("Error updating blog");
   }
 };
+
+/**
+ * Deletes a blog post.
+ * @param req The request object.
+ * @param res The response object.
+ */
+export const deleteBlog = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = (req as any).user.uid;
+    await BlogService.deleteBlog(id, userId);
+    res.status(204).send();
+  } catch (error: any) {
+    if (error.message === "Blog not found") {
+      return res.status(404).send(error.message);
+    }
+    if (error.message === "User is not the author of this blog") {
+      return res.status(403).send(error.message);
+    }
+    res.status(500).send("Error deleting blog");
+  }
+};

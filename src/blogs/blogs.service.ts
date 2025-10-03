@@ -93,4 +93,30 @@ export namespace BlogService {
     const newDoc = await blogRef.get();
     return { id: newDoc.id, ...newDoc.data() } as Blog;
   };
+
+  /**
+   * Deletes a blog post.
+   * @param blogId The ID of the blog to delete.
+   * @param userId The ID of the user attempting to delete the blog.
+   * @throws An error if the blog is not found or the user is not the author.
+   */
+  export const deleteBlog = async (
+    blogId: string,
+    userId: string
+  ): Promise<void> => {
+    const blogRef = firestoreDb.collection("blogPosts").doc(blogId);
+    const doc = await blogRef.get();
+
+    if (!doc.exists) {
+      throw new Error("Blog not found");
+    }
+
+    const blog = { id: doc.id, ...doc.data() } as Blog;
+
+    if (blog.authorId !== userId) {
+      throw new Error("User is not the author of this blog");
+    }
+
+    await blogRef.delete();
+  };
 }
