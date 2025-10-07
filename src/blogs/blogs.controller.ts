@@ -4,7 +4,7 @@ import { BlogService } from "./blogs.service";
 export const listBlogs = async (req: Request, res: Response) => {
   try {
     const blogs = await BlogService.getBlogs();
-    res.json(blogs);
+    res.status(200).send(blogs);
   } catch (error) {
     res.status(500).send("Error fetching blogs");
   }
