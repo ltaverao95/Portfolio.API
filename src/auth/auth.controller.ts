@@ -14,7 +14,7 @@ export namespace AuthController {
         return res.status(401).send("Invalid token or user not allowed");
       }
 
-      res.status(200).send("Token is valid");
+      res.status(200).send();
     } catch (error) {
       res.status(500).send("Error verifying token");
     }
