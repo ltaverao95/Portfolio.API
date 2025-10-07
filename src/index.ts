@@ -12,7 +12,7 @@ inject();
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:9002', 'https://portfolio-ui-six-fawn.vercel.app'],
+  origin: ['http://localhost:9002', 'https://taveralabs.com', 'https://portfolio-ui-six-fawn.vercel.app'],
   
 }
 
