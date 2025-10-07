@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import { authenticate } from '../auth/auth.middleware';
 import { createBlog, deleteBlog, deleteBlogs, listBlogs, updateBlog } from './blogs.controller';
-import { validateBlogData, validateDeleteBlogs } from './validators/blogs.validator';
+import { createBlogDtoValidator } from "./validators/blo.create.validator";
+import { updateBlogDtoValidator } from "./validators/blog.update.validator";
+import { deleteBlogsValidator } from './validators/blogs.delete.validator';
 
 const router = Router();
 
 router.get('/blogs', listBlogs);
-router.post('/blogs', authenticate, validateBlogData, createBlog);
-router.put('/blogs/:id', authenticate, validateBlogData, updateBlog);
-router.delete('/blogs/:id', authenticate, deleteBlog);
-router.post('/blogs/batch-delete', authenticate, validateDeleteBlogs, deleteBlogs);
+router.post('/blog', authenticate, createBlogDtoValidator, createBlog);
+router.put('/blog/:id', authenticate, updateBlogDtoValidator, updateBlog);
+router.delete('/blog/:id', authenticate, deleteBlog);
+router.post('/blog/batch-delete', authenticate, deleteBlogsValidator, deleteBlogs);
 
 export default router;

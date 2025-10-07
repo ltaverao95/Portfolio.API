@@ -1,9 +1,20 @@
 import { firestoreDb } from "../config/firebase";
 import { Blog } from "./models/blog.model";
-import { BlogDto } from "./models/blog-dto.model";
+import { CreateBlogDto } from "./models/create-blog-dto";
+import { UpdateBlogDto } from "./models/update-blog-dto";
+import { CacheService } from '../cache/cache.service';
+
+const blogCache = new CacheService<Blog[]>();
 
 export namespace BlogService {
   export const getBlogs = async (limit: number = 20): Promise<Blog[]> => {
+    const cacheKey = `blogs_limit_${limit}`;
+    const cachedBlogs = blogCache.get(cacheKey);
+
+    if (cachedBlogs) {
+      return cachedBlogs;
+    }
+
     const blogs: Blog[] = [];
 
     const querySnapshot = await firestoreDb
@@ -14,47 +25,43 @@ export namespace BlogService {
     querySnapshot.forEach((doc) => {
       blogs.push({ id: doc.id, ...doc.data() } as Blog);
     });
+
+    blogCache.set(cacheKey, blogs);
     return blogs;
   };
 
-  export const createBlog = async (userId: string, blogDto: BlogDto): Promise<Blog> => {
-    const { translations, imageUrl, url, tags } = blogDto;
+  export const createBlog = async (userId: string, createBlogDto: CreateBlogDto): Promise<Blog> => {
 
-    const title: { [key: string]: string } = {};
-    const content: { [key: string]: string } = {};
-    translations.forEach((t) => {
-      title[t.lang] = t.title;
-      content[t.lang] = t.content;
-    });
-
-    const newBlog: Omit<Blog, "id"> = {
-      title,
-      content,
-      defaultLanguage: translations[0].lang,
+    const newBlog: Blog = {
+      id: "",
+      title: createBlogDto.title,
+      content: createBlogDto.content,
+      defaultLanguage: createBlogDto.defaultLanguage,
       authorId: userId,
       publicationDate: new Date(),
       lastModifiedDate: new Date(),
-      tags: tags.split(",").map((tag) => tag.trim()),
-      imageUrl,
-      url,
+      tags: createBlogDto.tags,
+      imageUrl: createBlogDto.imageUrl,
+      url: createBlogDto.url
     };
 
     const docRef = await firestoreDb.collection("blogPosts").add(newBlog);
 
+    blogCache.clear();
     return { id: docRef.id, ...newBlog } as Blog;
   };
 
   /**
    * Updates an existing blog post.
    * @param blogId The ID of the blog to update.
-   * @param blogDto The data to update the blog with.
+   * @param updateBlogDto The data to update the blog with.
    * @param userId The ID of the user attempting to update the blog.
    * @returns The updated blog post.
    * @throws An error if the blog is not found or the user is not the author.
    */
   export const updateBlog = async (
     blogId: string,
-    blogDto: BlogDto,
+    updateBlogDto: UpdateBlogDto,
     userId: string
   ): Promise<Blog> => {
     const blogRef = firestoreDb.collection("blogPosts").doc(blogId);
@@ -70,26 +77,18 @@ export namespace BlogService {
       throw new Error("User is not the author of this blog");
     }
 
-    const { translations, imageUrl, url, tags } = blogDto;
-
-    const title: { [key: string]: string } = {};
-    const content: { [key: string]: string } = {};
-    translations.forEach((t) => {
-      title[t.lang] = t.title;
-      content[t.lang] = t.content;
-    });
-
     const updatedBlog: Partial<Blog> = {
-      title,
-      content,
+      title: updateBlogDto.title,
+      content: updateBlogDto.content,
       lastModifiedDate: new Date(),
-      tags: tags.split(",").map((tag) => tag.trim()),
-      imageUrl,
-      url,
+      tags: updateBlogDto.tags,
+      imageUrl: updateBlogDto.imageUrl,
+      url: updateBlogDto.url
     };
 
     await blogRef.update(updatedBlog);
 
+    blogCache.clear();
     const newDoc = await blogRef.get();
     return { id: newDoc.id, ...newDoc.data() } as Blog;
   };
@@ -118,6 +117,7 @@ export namespace BlogService {
     }
 
     await blogRef.delete();
+    blogCache.clear();
   };
 
   /**
@@ -151,5 +151,6 @@ export namespace BlogService {
     }
 
     await batch.commit();
+    blogCache.clear();
   };
 }
