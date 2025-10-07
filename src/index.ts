@@ -1,14 +1,22 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import { inject } from "@vercel/analytics"
 
 import blogRoutes from './blogs/blogs.routes';
 import authRoutes from './auth/auth.routes';
 
 dotenv.config();
+inject();
 
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+  origin: ['http://localhost:9002', 'https://portfolio-ui-six-fawn.vercel.app'],
+  
+}
+
+app.use(cors(corsOptions));
 app.use(
  express.json({
     limit: '20mb',
