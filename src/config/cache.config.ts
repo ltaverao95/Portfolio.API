@@ -1,3 +1,3 @@
 export const CACHE_CONFIG = {
-  TTL_MINUTES: 30,
+  TTL_MINUTES: 1,
 };

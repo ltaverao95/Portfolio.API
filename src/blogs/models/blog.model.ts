@@ -8,8 +8,8 @@ export interface Blog {
   };
   defaultLanguage: string;
   authorId: string;
-  publicationDate: Date;
-  lastModifiedDate: Date;
+  publicationDate: Date | string;
+  lastModifiedDate: Date | string;
   tags: string[];
   imageUrl: string;
   url: string;

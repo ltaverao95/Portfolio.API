@@ -2,7 +2,7 @@ import { firestoreDb } from "../config/firebase";
 import { Blog } from "./models/blog.model";
 import { CreateBlogDto } from "./models/create-blog-dto";
 import { UpdateBlogDto } from "./models/update-blog-dto";
-import { CacheService } from '../cache/cache.service';
+import { CacheService } from "../cache/cache.service";
 
 const blogCache = new CacheService<Blog[]>();
 
@@ -30,21 +30,21 @@ export namespace BlogService {
     return blogs;
   };
 
-  export const createBlog = async (userId: string, createBlogDto: CreateBlogDto): Promise<Blog> => {
-
-    const newBlog: Blog = {
-      id: "",
+  export const createBlog = async (
+    userId: string,
+    createBlogDto: CreateBlogDto
+  ): Promise<Blog> => {
+    const newBlog: Omit<Blog, "id"> = {
       title: createBlogDto.title,
       content: createBlogDto.content,
       defaultLanguage: createBlogDto.defaultLanguage,
       authorId: userId,
-      publicationDate: new Date(),
-      lastModifiedDate: new Date(),
+      publicationDate: new Date().toISOString(),
+      lastModifiedDate: new Date().toISOString(),
       tags: createBlogDto.tags,
       imageUrl: createBlogDto.imageUrl,
-      url: createBlogDto.url
+      url: createBlogDto.url,
     };
-
     const docRef = await firestoreDb.collection("blogPosts").add(newBlog);
 
     blogCache.clear();
@@ -83,7 +83,7 @@ export namespace BlogService {
       lastModifiedDate: new Date(),
       tags: updateBlogDto.tags,
       imageUrl: updateBlogDto.imageUrl,
-      url: updateBlogDto.url
+      url: updateBlogDto.url,
     };
 
     await blogRef.update(updatedBlog);
@@ -143,9 +143,7 @@ export namespace BlogService {
       }
       const blog = { id: doc.id, ...doc.data() } as Blog;
       if (blog.authorId !== userId) {
-        throw new Error(
-          `User is not the author of blog with ID ${doc.id}`
-        );
+        throw new Error(`User is not the author of blog with ID ${doc.id}`);
       }
       batch.delete(doc.ref);
     }
