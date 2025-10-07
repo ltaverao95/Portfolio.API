@@ -1,19 +1,21 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import { inject } from "@vercel/analytics"
 
 import blogRoutes from './blogs/blogs.routes';
 import authRoutes from './auth/auth.routes';
 
 dotenv.config();
-inject();
 
 const app = express();
+app.disable('x-powered-by');
+
+const helmet = require('helmet')
+app.use(helmet());
 
 const corsOptions = {
   origin: ['http://localhost:9002', 'https://taveralabs.com', 'https://portfolio-ui-six-fawn.vercel.app'],
-  
+  optionsSuccessStatus: 200 // For legacy browser support
 }
 
 app.use(cors(corsOptions));
@@ -25,6 +27,11 @@ app.use(
 
 app.use('/api', blogRoutes);
 app.use('/api/auth', authRoutes);
+
+// custom 404
+app.use((req, res, next) => {
+  res.status(404).send("Sorry can't find that!")
+})
 
 const port = parseInt(process.env.PORT || '3000');
 app.listen(port, () => {
