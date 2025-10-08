@@ -33,6 +33,11 @@ app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!")
 })
 
+if(process.env.NODE_ENV === 'production') {
+  console.log('in production');
+
+}
+
 const port = parseInt(process.env.PORT || '3000');
 app.listen(port, () => {
   console.log(`listening on port ${port} `);
