@@ -34,8 +34,7 @@ app.use((req, res, next) => {
 })
 
 if(process.env.NODE_ENV === 'production') {
-  console.log('in production');
-
+  console.info('in production');
 }
 
 const port = parseInt(process.env.PORT || '3000');
