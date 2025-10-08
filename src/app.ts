@@ -8,7 +8,11 @@ import authRoutes from "./auth/auth.routes";
 const app = express();
 app.disable("x-powered-by");
 
-app.use(helmet());
+app.use(helmet({
+    xFrameOptions: { action: 'deny' },
+    xContentTypeOptions: true,
+    referrerPolicy: { policy: 'no-referrer' }
+}));
 
 let corsOptions = {
   origin: ["https://taveralabs.com"],
