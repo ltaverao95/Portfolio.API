@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+
 import { AuthService } from "./auth.service";
 
 export const authenticate = async (

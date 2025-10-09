@@ -8,6 +8,8 @@ import rateLimit from "express-rate-limit";
 import blogRoutes from "./blogs/blogs.routes";
 import authRoutes from "./auth/auth.routes";
 
+require("./auth/auth.google.middleware");
+
 const app = express();
 app.disable("x-powered-by");
 
@@ -30,7 +32,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 let corsOptions = {
-  origin: ["https://taveralabs.com"],
+  origin: ["https://taveralabs.com", "https://accounts.google.com"],
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
@@ -39,6 +41,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(cors(corsOptions));
+
 app.use(
   express.json({
     limit: "20mb",
