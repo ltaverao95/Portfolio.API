@@ -27,17 +27,20 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
   standardHeaders: false, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  validate: {
+    xForwardedForHeader: false
+  }
 });
 
 app.use(limiter);
 
 let corsOptions = {
-  origin: ["https://taveralabs.com/", "https://accounts.google.com/"],
+  origin: ["https://taveralabs.com", "https://accounts.google.com"],
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
 if (process.env.NODE_ENV === "development") {
-  corsOptions.origin.push("http://localhost:9002/");
+  corsOptions.origin.push("http://localhost:9002");
 }
 
 app.use(cors(corsOptions));
