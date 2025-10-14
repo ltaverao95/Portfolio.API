@@ -8,19 +8,19 @@ export namespace AuthController {
     try {
       passport.authenticate("google", { scope: ["profile", "email"] });
     } catch (error) {
+      console.error("Error during authentication:", error);
       res.status(500).send("Error logging in");
-      console.log("Error during authentication:", error);
     }
   };
 
   export const oauthCallback = async (req: Request, res: Response) => {
     try {
       passport.authenticate("google", {
-        failureRedirect: "http://localhost:9002/login",
-        successRedirect: "http://localhost:9002/admin",
+        failureRedirect: `${process.env.FRONTEND_URL}/login`,
+        successRedirect: `${process.env.FRONTEND_URL}/admin`,
       });
     } catch (error) {
-      console.log("Error during OAuth callback:", error);
+      console.error("Error during OAuth callback:", error);
       res.status(500).send("Error during OAuth callback");
     }
   };
@@ -38,6 +38,7 @@ export namespace AuthController {
 
       res.status(200).send();
     } catch (error) {
+      console.error("Error verifying token:", error);
       res.status(500).send("Error verifying token");
     }
   };

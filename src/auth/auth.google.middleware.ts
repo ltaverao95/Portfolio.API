@@ -10,7 +10,7 @@ passport.use(
       passReqToCallback: true,
     },
     function (request, accessToken, refreshToken, profile, done) {
-      console.log("Google profile:", profile);
+      console.info("Google profile:", profile);
       return done(null, profile);
     }
   )

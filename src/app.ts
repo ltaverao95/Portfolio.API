@@ -27,9 +27,6 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
   standardHeaders: false, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  validate: {
-    xForwardedForHeader: false
-  }
 });
 
 app.use(limiter);
