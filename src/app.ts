@@ -49,7 +49,7 @@ app.use(
 );
 
 app.use("/api", blogRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api", authRoutes);
 
 // custom 404
 app.use((req, res, next) => {
