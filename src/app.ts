@@ -13,12 +13,14 @@ require("./auth/auth.google.middleware");
 const app = express();
 app.disable("x-powered-by");
 
-app.use(helmet({
-    xFrameOptions: { action: 'deny' },
+app.use(
+  helmet({
+    xFrameOptions: { action: "deny" },
     xContentTypeOptions: true,
-    referrerPolicy: { policy: 'no-referrer' },
-    hidePoweredBy: true
-}));
+    referrerPolicy: { policy: "no-referrer" },
+    hidePoweredBy: true,
+  })
+);
 
 app.use(compression());
 
@@ -30,7 +32,11 @@ const limiter = rateLimit({
 app.use(limiter);
 
 let corsOptions = {
-  origin: ["https://taveralabs.com", "https://preview.taveralabs.com", "https://accounts.google.com"],
+  origin: [
+    "https://taveralabs.com",
+    "https://preview.taveralabs.com",
+    "https://accounts.google.com",
+  ],
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
@@ -55,9 +61,16 @@ app.use((req, res, next) => {
 });
 
 // Centralized error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err);
-  res.status(500).send('Internal Server Error');
-});
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+);
 
 export default app;
