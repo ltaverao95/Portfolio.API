@@ -8,8 +8,6 @@ import rateLimit from "express-rate-limit";
 import blogRoutes from "./blogs/blogs.routes";
 import authRoutes from "./auth/auth.routes";
 
-require("./auth/auth.google.middleware");
-
 const app = express();
 app.disable("x-powered-by");
 
