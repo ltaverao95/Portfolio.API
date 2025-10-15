@@ -40,14 +40,13 @@ export namespace AuthController {
 
   export const oAuthCallback = async (req: Request, res: Response) => {
     try {
-      const queryString = req.url.split("?")[1] ?? null;
-      if (!queryString) {
+      const { code } = req.query;
+
+      if (!code) {
         return res.status(400).send("Missing query parameters");
       }
-      const queryParams = new url.URLSearchParams(queryString);
-      const code = queryParams.get("code");
 
-      const { tokens } = await authDictionary["oauth2Client"].getToken(code);
+      const { tokens } = await authDictionary["oauth2Client"].getToken(code.toString());
 
       const tokenInfo = await authDictionary["oauth2Client"].getTokenInfo(
         tokens.access_token
@@ -63,6 +62,18 @@ export namespace AuthController {
       res
         .status(200)
         .redirect(`${process.env.FRONTEND_URL}/login?token=${tokens.id_token}`);
+    } catch (error) {
+      console.error("Error during OAuth callback:", error);
+      res.status(500).send("Error during OAuth callback");
+    }
+  };
+
+  export const signOut = async (req: Request, res: Response) => {
+    try {
+      const idToken = req.headers.authorization?.split("Bearer ")[1];
+      await authDictionary["oauth2Client"].revokeToken(idToken);
+
+      res.status(200).send();
     } catch (error) {
       console.error("Error during OAuth callback:", error);
       res.status(500).send("Error during OAuth callback");
