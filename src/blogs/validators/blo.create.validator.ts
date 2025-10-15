@@ -19,9 +19,11 @@ export const createBlogDtoValidator = (
     return res.status(400).json({ message: "Title is required." });
   }
 
-  if (!content ||
+  if (
+    !content ||
     typeof content !== "object" ||
-    Object.keys(content).length === 0) {
+    Object.keys(content).length === 0
+  ) {
     return res.status(400).json({ message: "Content is required." });
   }
 
