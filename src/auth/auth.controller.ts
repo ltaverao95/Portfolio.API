@@ -55,11 +55,7 @@ export namespace AuthController {
 
       if (!AuthService.isUserAllowed(tokenInfo.email)) {
         authDictionary["oauth2Client"].revokeCredentials();
-        return res
-          .status(403)
-          .redirect(
-            `${process.env.FRONTEND_URL}/login`
-          );
+        return res.status(403).redirect(`${process.env.FRONTEND_URL}/login`);
       }
 
       authDictionary["oauth2Client"].setCredentials(tokens);
