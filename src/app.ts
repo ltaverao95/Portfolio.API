@@ -30,7 +30,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 let corsOptions = {
-  origin: ["https://taveralabs.com", "https://accounts.google.com"],
+  origin: ["https://taveralabs.com", "https://preview.taveralabs.com", "https://accounts.google.com"],
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
