@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import url from "url";
 import { google, Auth } from "googleapis";
 
 import { AuthService } from "./auth.service";
@@ -43,17 +42,19 @@ export namespace AuthController {
       const { code } = req.query;
 
       if (!code) {
-        return res.status(400).send("Missing query parameters");
+        return res.status(400).redirect(`${process.env.FRONTEND_URL}/login`);
       }
 
-      const { tokens } = await authDictionary["oauth2Client"].getToken(code.toString());
+      const { tokens } = await authDictionary["oauth2Client"].getToken(
+        code.toString()
+      );
 
       const tokenInfo = await authDictionary["oauth2Client"].getTokenInfo(
         tokens.access_token
       );
 
       if (!AuthService.isUserAllowed(tokenInfo.email)) {
-        authDictionary["oauth2Client"].revokeCredentials();
+        authDictionary["oauth2Client"].revokeToken(tokens.access_token);
         return res.status(403).redirect(`${process.env.FRONTEND_URL}/login`);
       }
 
@@ -70,9 +71,7 @@ export namespace AuthController {
 
   export const signOut = async (req: Request, res: Response) => {
     try {
-      const idToken = req.headers.authorization?.split("Bearer ")[1];
-      await authDictionary["oauth2Client"].revokeToken(idToken);
-
+      await authDictionary["oauth2Client"].revokeCredentials();
       res.status(200).send();
     } catch (error) {
       console.error("Error during OAuth callback:", error);
