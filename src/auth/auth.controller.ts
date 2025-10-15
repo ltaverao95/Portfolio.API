@@ -13,7 +13,7 @@ export namespace AuthController {
     }
   };
 
-  export const oauthCallback = async (req: Request, res: Response) => {
+  export const oAuthCallback = async (req: Request, res: Response) => {
     try {
       passport.authenticate("google", {
         failureRedirect: `${process.env.FRONTEND_URL}/login`,
