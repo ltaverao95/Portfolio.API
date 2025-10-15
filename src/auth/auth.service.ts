@@ -1,7 +1,7 @@
-import * as firebaseAdmin from "firebase-admin";
-import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
+import { Auth } from "googleapis";
+import { authDictionary } from "./auth.controller";
 
-const allowedUsers = ["SrcXwvKthuXI6ulWAs61cnh4g822"];
+const allowedUsers = ["felipetavera0412@gmail.com"];
 
 export namespace AuthService {
   /**
@@ -13,20 +13,32 @@ export namespace AuthService {
     return allowedUsers.includes(userId);
   };
 
-  export const validateToken = async (token: string): Promise<DecodedIdToken> => {
+  export const validateToken = async (token: string): Promise<string> => {
     if (!token) {
       return null;
     }
 
-    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
-    if (!decodedToken) {
+    const verifiedIdToken = await authDictionary["oauth2Client"].verifyIdToken({
+      idToken: token,
+    });
+    if (!verifiedIdToken) {
       return null;
     }
 
-    if (!AuthService.isUserAllowed(decodedToken.uid)) {
+    const payload = verifiedIdToken.getPayload();
+    if (!payload) {
       return null;
     }
 
-    return decodedToken;
+    if (!AuthService.isUserAllowed(payload.email) || !payload.email_verified) {
+      return null;
+    }
+
+    const userId = verifiedIdToken.getUserId();
+    if (!userId) {
+      return null;
+    }
+
+    return userId;
   };
 }

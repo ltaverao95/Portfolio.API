@@ -14,12 +14,12 @@ export const authenticate = async (
       return res.status(401).send("Unauthorized");
     }
 
-    const decodedToken = await AuthService.validateToken(idToken);
-    if (!decodedToken) {
+    const userId = await AuthService.validateToken(idToken);
+    if (!userId) {
       return res.status(403).send("Forbidden");
     }
 
-    (req as any).user = decodedToken;
+    (req as any).user = { id: userId };
     next();
   } catch (error) {
     console.error("Error verifying ID token:", error);

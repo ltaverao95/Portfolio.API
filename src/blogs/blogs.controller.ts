@@ -12,7 +12,7 @@ export const listBlogs = async (req: Request, res: Response) => {
 
 export const createBlog = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.uid;
+    const userId = (req as any).user.id;
     const newBlog = await BlogService.createBlog(userId, req.body);
     res.status(201).json(newBlog);
   } catch (error) {
@@ -28,7 +28,7 @@ export const createBlog = async (req: Request, res: Response) => {
 export const updateBlog = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = (req as any).user.uid;
+    const userId = (req as any).user.id;
     const updatedBlog = await BlogService.updateBlog(id, req.body, userId);
     res.json(updatedBlog);
   } catch (error: any) {
@@ -50,7 +50,7 @@ export const updateBlog = async (req: Request, res: Response) => {
 export const deleteBlog = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = (req as any).user.uid;
+    const userId = (req as any).user.id;
     await BlogService.deleteBlogById(id, userId);
     res.status(204).send();
   } catch (error: any) {
@@ -72,7 +72,7 @@ export const deleteBlog = async (req: Request, res: Response) => {
 export const deleteBlogs = async (req: Request, res: Response) => {
   try {
     const { blogIds } = req.body;
-    const userId = (req as any).user.uid;
+    const userId = (req as any).user.id;
     await BlogService.deleteBlogs(blogIds, userId);
     res.status(204).send();
   } catch (error: any) {
