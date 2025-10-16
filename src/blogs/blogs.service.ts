@@ -4,12 +4,12 @@ import { CreateBlogDto } from "./models/create-blog-dto";
 import { UpdateBlogDto } from "./models/update-blog-dto";
 import { CacheService } from "../cache/cache.service";
 
-const blogCache = new CacheService<Omit<Blog, "archived">[]>();
+const blogCache = new CacheService<Blog[]>();
 
 export namespace BlogService {
   export const getBlogs = async (
     limit: number = 20
-  ): Promise<Omit<Blog, "archived">[]> => {
+  ): Promise<Blog[]> => {
     const cacheKey = `blogs_limit_${limit}`;
     const cachedBlogs = blogCache.get(cacheKey);
 
@@ -17,7 +17,7 @@ export namespace BlogService {
       return cachedBlogs;
     }
 
-    const blogs: Omit<Blog, "archived">[] = [];
+    const blogs: Blog[] = [];
 
     const querySnapshot = await firestoreDb
       .collection("blogPosts")
@@ -26,7 +26,8 @@ export namespace BlogService {
       .get();
 
     querySnapshot.forEach((doc) => {
-      blogs.push({ id: doc.id, ...doc.data() } as Omit<Blog, "archived">);
+      const { archived, ...data } = doc.data();
+      blogs.push({ id: doc.id, ...data } as Blog);
     });
 
     blogCache.set(cacheKey, blogs);
