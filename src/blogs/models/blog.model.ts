@@ -13,4 +13,5 @@ export interface Blog {
   tags: string[];
   imageUrl: string;
   url: string;
+  archived: boolean;
 }

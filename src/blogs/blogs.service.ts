@@ -4,10 +4,12 @@ import { CreateBlogDto } from "./models/create-blog-dto";
 import { UpdateBlogDto } from "./models/update-blog-dto";
 import { CacheService } from "../cache/cache.service";
 
-const blogCache = new CacheService<Blog[]>();
+const blogCache = new CacheService<Omit<Blog, "archived">[]>();
 
 export namespace BlogService {
-  export const getBlogs = async (limit: number = 20): Promise<Blog[]> => {
+  export const getBlogs = async (
+    limit: number = 20
+  ): Promise<Omit<Blog, "archived">[]> => {
     const cacheKey = `blogs_limit_${limit}`;
     const cachedBlogs = blogCache.get(cacheKey);
 
@@ -15,15 +17,16 @@ export namespace BlogService {
       return cachedBlogs;
     }
 
-    const blogs: Blog[] = [];
+    const blogs: Omit<Blog, "archived">[] = [];
 
     const querySnapshot = await firestoreDb
       .collection("blogPosts")
+      .where("archived", "!=", true)
       .limit(limit)
       .get();
 
     querySnapshot.forEach((doc) => {
-      blogs.push({ id: doc.id, ...doc.data() } as Blog);
+      blogs.push({ id: doc.id, ...doc.data() } as Omit<Blog, "archived">);
     });
 
     blogCache.set(cacheKey, blogs);
@@ -44,6 +47,7 @@ export namespace BlogService {
       tags: createBlogDto.tags,
       imageUrl: createBlogDto.imageUrl,
       url: createBlogDto.url,
+      archived: false,
     };
     const docRef = await firestoreDb.collection("blogPosts").add(newBlog);
 
@@ -116,7 +120,7 @@ export namespace BlogService {
       throw new Error("User is not the author of this blog");
     }
 
-    await blogRef.delete();
+    await blogRef.update({ archived: true, lastModifiedDate: new Date() });
     blogCache.clear();
   };
 
@@ -145,7 +149,7 @@ export namespace BlogService {
       if (blog.authorId !== userId) {
         throw new Error(`User is not the author of blog with ID ${doc.id}`);
       }
-      batch.delete(doc.ref);
+      batch.update(doc.ref, { archived: true, lastModifiedDate: new Date() });
     }
 
     await batch.commit();
