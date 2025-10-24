@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { BlogService } from "./blogs.service";
 
+/**
+ * Lists all blog posts.
+ * @param req The request object.
+ * @param res The response object.
+ */
 export const listBlogs = async (req: Request, res: Response) => {
   try {
     const blogs = await BlogService.getBlogs();
@@ -10,6 +15,11 @@ export const listBlogs = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Creates a new blog post.
+ * @param req The request object.
+ * @param res The response object.
+ */
 export const createBlog = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;

@@ -7,6 +7,12 @@ import { CacheService } from "../cache/cache.service";
 const blogCache = new CacheService<Blog[]>();
 
 export namespace BlogService {
+  
+  /**
+   * Retrieves a list of blog posts.
+   * @param limit The maximum number of blog posts to retrieve.
+   * @returns A promise that resolves to an array of blog posts.
+   */
   export const getBlogs = async (
     limit: number = 20
   ): Promise<Blog[]> => {
@@ -34,6 +40,12 @@ export namespace BlogService {
     return blogs;
   };
 
+  /**
+   * Creates a new blog post.
+   * @param userId The ID of the user creating the blog.
+   * @param createBlogDto The data for the new blog post.
+   * @returns The created blog post.
+   */
   export const createBlog = async (
     userId: string,
     createBlogDto: CreateBlogDto
