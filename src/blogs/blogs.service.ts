@@ -8,14 +8,21 @@ const blogCache = new CacheService<Blog[]>();
 
 export namespace BlogService {
   
+  const maximumBlogsAllowed = 20;
+
   /**
    * Retrieves a list of blog posts.
    * @param limit The maximum number of blog posts to retrieve.
    * @returns A promise that resolves to an array of blog posts.
    */
   export const getBlogs = async (
-    limit: number = 20
+    limit: number = null
   ): Promise<Blog[]> => {
+
+    if (!limit || limit <= 0 || limit > maximumBlogsAllowed) {
+      limit = maximumBlogsAllowed;
+    }
+
     const cacheKey = `blogs_limit_${limit}`;
     const cachedBlogs = blogCache.get(cacheKey);
 
